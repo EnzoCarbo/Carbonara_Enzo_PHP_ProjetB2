@@ -1,0 +1,48 @@
+<?php
+class User {
+    private $pdo;
+
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+
+    public function getUserById($user_id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = :user_id");
+        $stmt->execute(['user_id' => $user_id]);
+        return $stmt->fetch();
+    }
+
+    public function getUserByEmailOrUsername($login) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :login OR username = :login");
+        $stmt->execute(['login' => $login]);
+        return $stmt->fetch();
+    }
+
+    public function createUser($username, $email, $password, $role) {
+        $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, :role)");
+        return $stmt->execute([
+            ':username' => $username,
+            ':email' => $email,
+            ':password' => $password,
+            ':role' => $role
+        ]);
+    }
+
+    public function register($email, $username, $password) {
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+        $stmt = $this->pdo->prepare("INSERT INTO users (email, username, password) VALUES (:email, :username, :password)");
+        $stmt->execute([
+            'email' => $email,
+            'username' => $username,
+            'password' => $hashedPassword
+        ]);
+    }
+
+    public function checkIfExists($email, $username) {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email OR username = :username");
+        $stmt->execute(['email' => $email, 'username' => $username]);
+        return $stmt->fetchColumn() > 0;
+    }
+}
+?>
