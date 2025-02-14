@@ -17,7 +17,7 @@ $skills = $skillModel->getSkillsByUserId($_SESSION['user_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes compétences</title>
-    <link rel="stylesheet" href="../public/assets/css/style.css">
+    <link rel="stylesheet" href="../public/assets/css/skills.css">
 </head>
 <body>
     <header>
@@ -35,9 +35,29 @@ $skills = $skillModel->getSkillsByUserId($_SESSION['user_id']);
         <a href="add_skill.php">Ajouter une compétence</a>
         <ul>
             <?php foreach ($skills as $skill): ?>
-                <li>
+                <?php
+                $levelClass = '';
+                switch ($skill['level']) {
+                    case 'Débutant':
+                        $levelClass = 'level-debutant';
+                        break;
+                    case 'Intermédiaire':
+                        $levelClass = 'level-intermediaire';
+                        break;
+                    case 'Avancé':
+                        $levelClass = 'level-avance';
+                        break;
+                    case 'Expert':
+                        $levelClass = 'level-expert';
+                        break;
+                }
+                ?>
+                <li class="<?php echo $levelClass; ?>">
                     <h3><?php echo htmlspecialchars($skill['name']); ?></h3>
                     <p>Niveau : <?php echo htmlspecialchars($skill['level']); ?></p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-inner"></div>
+                    </div>
                     <a href="edit_skill.php?id=<?php echo $skill['id']; ?>">Modifier</a>
                     <a href="../controllers/delete_skill.php?id=<?php echo $skill['id']; ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette compétence ?')">Supprimer</a>
                 </li>

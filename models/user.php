@@ -6,11 +6,32 @@ class User {
         $this->pdo = $pdo;
     }
 
+    public function getAllUsers() {
+        $stmt = $this->pdo->prepare("SELECT * FROM users");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function getUserById($user_id) {
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = :user_id");
         $stmt->execute(['user_id' => $user_id]);
         return $stmt->fetch();
     }
+
+    public function updateUserRole($user_id, $role) {
+        $stmt = $this->pdo->prepare("UPDATE users SET role = :role WHERE id = :user_id");
+        $stmt->execute([
+            'user_id' => $user_id,
+            'role' => $role
+        ]);
+    }
+    
+    public function getUserByEmail($email) {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->execute(['email' => $email]);
+        return $stmt->fetch();
+    }
+    
 
     public function getUserByEmailOrUsername($login) {
         $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :login OR username = :login");
@@ -44,5 +65,25 @@ class User {
         $stmt->execute(['email' => $email, 'username' => $username]);
         return $stmt->fetchColumn() > 0;
     }
+    
+    public function updateUser($user_id, $data) {
+        $setParts = [];
+        $params = ['user_id' => $user_id];
+
+        foreach ($data as $key => $value) {
+            $setParts[] = "$key = :$key";
+            $params[$key] = $value;
+        }
+
+        $sql = "UPDATE users SET " . implode(", ", $setParts) . " WHERE id = :user_id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute($params);
+    }
+
+    public function deleteUser($user_id) {
+        $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = :user_id");
+        $stmt->execute(['user_id' => $user_id]);
+    }
+
 }
 ?>

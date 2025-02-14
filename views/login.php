@@ -1,31 +1,27 @@
 <?php
 session_start();
 require_once '../config/database.php';
-require_once '../models/user.php';
+require_once '../models/User.php';
 
-$error = '';
+if (isset($_SESSION['user_id'])) {
+    header('Location: dashboard.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $login = isset($_POST['login']) ? trim($_POST['login']) : null;
-    $password = isset($_POST['password']) ? $_POST['password'] : null;
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    if ($login && $password) {
-        $userModel = new User($pdo);
+    $userModel = new User($pdo);
+    $user = $userModel->getUserByEmail($email);
 
-        // Vérification si l'utilisateur existe avec l'email ou le nom d'utilisateur
-        $user = $userModel->getUserByEmailOrUsername($login);
-
-        if ($user && password_verify($password, $user['password'])) {
-            // Authentification réussie, démarrer la session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            header('Location: dashboard.php');
-            exit();
-        } else {
-            $error = "Identifiants incorrects.";
-        }
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
+        header('Location: dashboard.php');
+        exit();
     } else {
-        $error = "Tous les champs doivent être remplis.";
+        $error = 'Email ou mot de passe incorrect.';
     }
 }
 ?>
@@ -37,13 +33,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../public/assets/css/login.css">
 </head>
 <body>
-    <h2>Connexion</h2>
-    <?php if ($error) { echo "<p style='color: red;'>$error</p>"; } ?>
-    <form action="login.php" method="post">
-        <input type="text" name="login" placeholder="Email ou Nom d'utilisateur" required>
-        <input type="password" name="password" placeholder="Mot de passe" required>
-        <button type="submit">Se connecter</button>
-    </form>
-    <a href="register.php">Pas encore inscrit ?</a>
+
+    <section>
+        <?php if (isset($error)): ?>
+            <p style="color: red;"><?php echo $error; ?></p>
+        <?php endif; ?>
+        <form action="login.php" method="POST">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Se connecter</button>
+        </form>
+        <a href="register.php">Pas encore inscrit ?</a>
+    </section>
 </body>
 </html>

@@ -25,7 +25,7 @@ $isAdmin = ($user['role'] === 'admin');
 <body>
     <header>
         <h1>Bienvenue sur votre tableau de bord</h1>
-        <p>Bonjour, <?php echo htmlspecialchars($user['email']); ?></p>
+        <p>Bonjour, <?php echo htmlspecialchars($user['username']); ?></p>
         <nav>
             <a href="profile.php">Mon profil</a>
             <a href="projects.php">Mes projets</a>

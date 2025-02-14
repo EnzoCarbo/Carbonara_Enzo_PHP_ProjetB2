@@ -19,13 +19,48 @@ if (!$project || $project['user_id'] != $_SESSION['user_id']) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
-    $image_url = $_POST['image_url'];
     $project_url = $_POST['project_url'];
 
-    $projectModel->updateProject($project['id'], $title, $description, $image_url, $project_url);
+  
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $imageTmpPath = $_FILES['image']['tmp_name'];
+        $imageName = $_FILES['image']['name'];
+        $imageSize = $_FILES['image']['size'];
+        $imageType = $_FILES['image']['type'];
+        $imageExtension = strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
 
-    header('Location: projects.php');
-    exit();
+       
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($imageExtension, $allowedExtensions)) {
+           
+            $uploadDir = '../public/uploads/';
+            $destPath = $uploadDir . $imageName;
+
+           
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+           
+            if (move_uploaded_file($imageTmpPath, $destPath)) {
+                $image_url = 'public/uploads/' . $imageName; 
+            } else {
+                $error = 'Erreur lors du téléchargement de l\'image.';
+            }
+        } else {
+            $error = 'Extension de fichier non autorisée.';
+        }
+    } else {
+        $image_url = $project['image_url']; 
+    }
+
+    if (!isset($error)) {
+        $projectModel->updateProject($project['id'], $title, $description, $image_url, $project_url);
+
+        header('Location: projects.php');
+        exit();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -34,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier un projet</title>
-    <link rel="stylesheet" href="../public/assets/css/style.css">
+    <link rel="stylesheet" href="../public/assets/css/edit_projects.css">
 </head>
 <body>
     <header>
@@ -45,15 +80,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </header>
 
     <section>
-        <form action="edit_project.php?id=<?php echo $project['id']; ?>" method="POST">
+        <?php if (isset($error)): ?>
+            <p style="color: red;"><?php echo $error; ?></p>
+        <?php endif; ?>
+        <form action="edit_project.php?id=<?php echo $project['id']; ?>" method="POST" enctype="multipart/form-data">
             <label for="title">Titre du projet</label>
             <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($project['title']); ?>" required>
 
             <label for="description">Description</label>
             <textarea id="description" name="description" required><?php echo htmlspecialchars($project['description']); ?></textarea>
 
-            <label for="image_url">URL de l'image</label>
-            <input type="text" id="image_url" name="image_url" value="<?php echo htmlspecialchars($project['image_url']); ?>" required>
+            <?php if (!empty($project['image_url'])): ?>
+                <img src="<?php echo htmlspecialchars($project['image_url']); ?>" alt="Image du projet" style="max-width: 200px;">
+            <?php endif; ?>
+            <label for="image">Changer l'image du projet</label>
+            <input type="file" id="image" name="image" accept="image/*">
 
             <label for="project_url">URL du projet</label>
             <input type="text" id="project_url" name="project_url" value="<?php echo htmlspecialchars($project['project_url']); ?>" required>

@@ -37,4 +37,14 @@ class Session {
         unset($_SESSION['flash']);
         return $flash;
     }
+
+    /**
+     * Vérifie si l'utilisateur est administrateur
+     *
+     * @return bool True si l'utilisateur est administrateur, sinon false
+     */
+    public static function isAdmin(): bool {
+        self::start();
+        return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    }
 }

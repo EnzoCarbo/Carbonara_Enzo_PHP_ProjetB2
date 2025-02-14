@@ -41,8 +41,8 @@ CREATE TABLE projects (
     user_id INT,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    image VARCHAR(255),
-    link VARCHAR(255),
+    image_url VARCHAR(255),
+    project_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -50,7 +50,7 @@ CREATE TABLE projects (
 INSERT INTO skills (name) VALUES
 ('PHP'), ('JavaScript'), ('SQL'), ('HTML/CSS'), ('Linux');
 
-INSERT INTO projects (user_id, title, description, image, link) VALUES
+INSERT INTO projects (user_id, title, description, image_url,  project_url) VALUES
 (1, 'Projet Admin', 'Projet de test administrateur', NULL, 'https://example.com'),
 (2, 'Projet User1', 'Projet test utilisateur 1', NULL, 'https://example.com'),
 (3, 'Projet User2', 'Projet test utilisateur 2', NULL, 'https://example.com');

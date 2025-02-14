@@ -17,11 +17,12 @@ $user = $userModel->getUserById($_SESSION['user_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon profil</title>
-    <link rel="stylesheet" href="../public/assets/css/style.css">
+    <link rel="stylesheet" href="../public/assets/css/profile.css">
+
 </head>
 <body>
     <header>
-        <h1>Profil de <?php echo htmlspecialchars($user['email']); ?></h1>
+        <h1>Profil de <?php echo htmlspecialchars($user['username']); ?></h1>
         <nav>
             <a href="dashboard.php">Tableau de bord</a>
             <a href="projects.php">Mes projets</a>
@@ -33,6 +34,9 @@ $user = $userModel->getUserById($_SESSION['user_id']);
     <section>
         <h2>Informations utilisateur</h2>
         <form action="update_profile.php" method="POST">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+            
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
             
