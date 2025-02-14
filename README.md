@@ -42,8 +42,9 @@ Ce projet est une application web développée en PHP & MySQL permettant aux uti
 1. Cloner le projet sur votre serveur local :
    ```sh
    git clone https://github.com/EnzoCarbo/Carbonara_Enzo_PHP_ProjetB2
-   Ouvrir le dossier téléchargé dans votre IDE
    ```
+   Ouvrir le dossier téléchargé dans votre IDE
+   
 2. Importer la base de données :
    - La base de donnée se situe dans le fichier database.sql
 
